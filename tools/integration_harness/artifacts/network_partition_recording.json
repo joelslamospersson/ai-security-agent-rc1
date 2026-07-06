@@ -1,0 +1,23 @@
+{
+  "scenario": "network_partition",
+  "duration": 0.0001456737518310547,
+  "events": [
+    {
+      "timestamp": 7.152557373046875e-07,
+      "type": "scenario_start",
+      "source": "harness",
+      "data": {
+        "name": "network_partition"
+      }
+    },
+    {
+      "timestamp": 0.0001361370086669922,
+      "type": "scenario_end",
+      "source": "harness",
+      "data": {
+        "status": "passed",
+        "duration": 0.00012969970703125
+      }
+    }
+  ]
+}

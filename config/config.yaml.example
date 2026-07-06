@@ -1,0 +1,430 @@
+# =============================================================================
+# AI Security Agent — Configuration File
+# =============================================================================
+#
+# This is the primary configuration file. It is loaded after internal defaults
+# and before AISEC_* environment variables (which override these values).
+#
+# After modifying this file, restart the agent:
+#     sudo systemctl restart ai-security-agent
+#
+# For a quick test:
+#     python -m security_agent --config /path/to/this/file
+#
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# General Settings
+# ---------------------------------------------------------------------------
+general:
+  # Enable debug mode (verbose logging, console output).
+  # Env override: AISEC_DEBUG=true
+  # Default: false
+  debug: false
+
+  # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  # Env override: AISEC_LOG_LEVEL=DEBUG
+  # Default: INFO
+  log_level: INFO
+
+  # Hostname override. Leave empty for auto-detection.
+  # Env override: AISEC_HOSTNAME=my-server
+  # Default: "" (auto-detect)
+  hostname: ""
+
+  # Security profile: default, web_server, reverse_proxy, database,
+  #                   docker_host, game_server, mail_server, development, custom
+  # Env override: AISEC_PROFILE=web_server
+  # Default: default
+  profile: default
+
+# ---------------------------------------------------------------------------
+# Logging Settings
+# ---------------------------------------------------------------------------
+logging:
+  # Output format: "console" (human-readable) or "json" (structured logs)
+  # Default: console
+  format: console
+
+  # Log file path. Leave empty for stderr.
+  # Env override: AISEC_LOG_FILE=/var/log/ai-security-agent/agent.log
+  # Default: null (stderr)
+  file: null
+
+  # Log rotation interval: "1 hour", "6 hours", "12 hours", "1 day",
+  #                         "7 days", "30 days"
+  # Default: 1 day
+  rotation: "1 day"
+
+  # Log retention period: "1 hour", "6 hours", "12 hours", "1 day",
+  #                        "7 days", "30 days"
+  # Default: 30 days
+  retention: "30 days"
+
+# ---------------------------------------------------------------------------
+# Database Settings
+# ---------------------------------------------------------------------------
+database:
+  # Backend: "sqlite", "postgres", "mysql"
+  # Env override: AISEC_DB_BACKEND=sqlite
+  # Default: sqlite
+  backend: sqlite
+
+  # SQLite-specific settings (used when backend is "sqlite")
+  sqlite:
+    # Path to the SQLite database file. Directory must exist and be writable.
+    # Env override: AISEC_DB_PATH=/var/lib/ai-security-agent/data/agent.db
+    # Default: /var/lib/ai-security-agent/data/agent.db
+    path: "/var/lib/ai-security-agent/data/agent.db"
+
+    # Enable WAL mode for better concurrent access.
+    # Default: true
+    wal_mode: true
+
+    # Busy timeout in milliseconds (0-60000).
+    # Default: 5000
+    busy_timeout: 5000
+
+    # SQLite page cache size in KB (negative = KB, positive = pages).
+    # Default: -64000 (64 MB cache)
+    cache_size: -64000
+
+  # PostgreSQL-specific settings (used when backend is "postgres")
+  postgres:
+    host: "localhost"
+    port: 5432
+    database: "ai_security"
+    user: "ai_security"
+    password: ""         # Set via environment: AISEC_DB_PASSWORD=secret
+    max_connections: 10
+    connect_timeout: 10
+
+  # MySQL-specific settings (used when backend is "mysql")
+  mysql:
+    host: "localhost"
+    port: 3306
+    database: "ai_security"
+    user: "ai_security"
+    password: ""         # Set via environment: AISEC_DB_PASSWORD=secret
+    max_connections: 10
+    connect_timeout: 10
+
+# ---------------------------------------------------------------------------
+# Discord Alert Settings
+# ---------------------------------------------------------------------------
+discord:
+  # Enable Discord alerts.
+  # Env override: AISEC_DISCORD_ENABLED=true
+  # Default: false
+  enabled: false
+
+  # Discord webhook URL for sending alerts.
+  # Env override: AISEC_DISCORD_WEBHOOK=https://discord.com/api/webhooks/...
+  # Default: null
+  webhook: null
+
+  # Discord bot token (alternative to webhook, for advanced features).
+  # Default: null
+  bot_token: null
+
+  # Discord guild/server ID to monitor.
+  # Default: null
+  guild_id: null
+
+  # Per-channel webhook URLs (overrides the main webhook for specific types).
+  channels:
+    info: null
+    warning: null
+    critical: null
+    security: null
+    system: null
+    bans: null
+
+# ---------------------------------------------------------------------------
+# Security Settings
+# ---------------------------------------------------------------------------
+security:
+  # Learning mode: observes normal behavior without enforcing bans.
+  # Exploit signatures, brute-force, and malware detection remain active.
+  # Default: false
+  learning_mode: false
+
+  # Learning mode duration in hours (1-720).
+  # Default: 48
+  learning_duration_hours: 48
+
+  # Networks that are always trusted. CIDR notation.
+  # Example: ["10.0.0.0/8", "192.168.0.0/16", "172.16.0.0/12"]
+  # Env override: AISEC_TRUSTED_NETWORKS=10.0.0.0/8,192.168.0.0/16
+  # Default: []
+  trusted_networks: []
+
+  # IP addresses that are never banned.
+  # Env override: AISEC_WHITELIST=1.2.3.4,5.6.7.8
+  # Default: []
+  whitelist: []
+
+  # IP addresses that are always banned when detected.
+  # Default: []
+  blacklist: []
+
+  # Detection thresholds (configurable per attack type)
+  thresholds:
+    # SSH brute force: number of failures within time window (seconds)
+    ssh_brute_force_count: 10
+    ssh_brute_force_window: 300       # 5 minutes
+
+    # Port scan: number of unique ports within time window
+    port_scan_count: 50
+    port_scan_window: 60              # 1 minute
+
+    # HTTP flood: requests per second from one source
+    http_flood_count: 1000
+    http_flood_window: 60
+
+    # Authentication failures: count within time window
+    auth_failure_count: 5
+    auth_failure_window: 300
+
+  # Reputation engine settings
+  reputation:
+    # Points recovered toward 0 per hour of normal activity.
+    # Default: 1
+    decay_points_per_hour: 1
+
+    # Maximum reputation recovery per day.
+    # Default: 24
+    max_decay_daily: 24
+
+    # Score range: -100 (malicious) to +100 (trusted)
+    # Default: 0 (unknown)
+    initial_score: 0
+    max_score: 100
+    min_score: -100
+
+  # Ban policy
+  ban_policy:
+    # Enable automatic banning.
+    # Default: true
+    enabled: true
+
+    # Never ban private IP addresses (10.x, 192.168.x, 172.16-31.x).
+    # Default: true
+    private_ip_exemption: true
+
+    # Enable ban duration escalation for repeat offenders.
+    # Default: true
+    escalation_enabled: true
+
+    # Ban durations per escalation level (seconds).
+    # Level 0: Warning (no ban)
+    # Level 1: 30 minutes
+    # Level 2: 1 hour
+    # Level 3: 3 hours
+    # Level 4: 24 hours
+    # Level 5: 2 days
+    # Level 6: 7 days
+    # Level 7: Permanent
+    # Exactly 8 values required.
+    durations: [0, 1800, 3600, 10800, 86400, 172800, 604800, 0]
+
+# ---------------------------------------------------------------------------
+# Firewall Settings
+# ---------------------------------------------------------------------------
+firewall:
+  # Firewall backend: "iptables", "nftables", "ipset", "fail2ban"
+  # Env override: AISEC_FW_BACKEND=nftables
+  # Default: nftables
+  backend: nftables
+
+  # Enable IPv6 firewall rules alongside IPv4.
+  # Default: true
+  enable_ipv6: true
+
+  # Number of individual bans before switching to ipset/nftables sets.
+  # Default: 100
+  ipset_threshold: 100
+
+  # Fail2Ban jail name (when backend is "fail2ban").
+  # Default: ai-security-agent
+  fail2ban_jail: "ai-security-agent"
+
+  # Interval (seconds) for cleaning up expired firewall rules.
+  # Default: 60
+  cleanup_interval: 60
+
+# ---------------------------------------------------------------------------
+# Monitoring Settings
+# ---------------------------------------------------------------------------
+monitoring:
+  # systemd-journald subscription settings
+  journald:
+    # Enable journald monitoring.
+    # Default: true
+    enabled: true
+
+    # Journal units to monitor. Supports glob patterns.
+    # Default: [ssh.service, sshd.service, docker.service, containerd.service]
+    units:
+      - "ssh.service"
+      - "sshd.service"
+      - "docker.service"
+      - "containerd.service"
+
+    # Minimum priority: emerg, alert, crit, err, warning, notice, info, debug
+    # Default: info
+    priority: info
+
+  # Log file monitoring settings
+  log_files:
+    # Enable log file monitoring.
+    # Default: true
+    enabled: true
+
+    # Paths to monitor, grouped by service.
+    paths:
+      auth:
+        - "/var/log/auth.log"
+        - "/var/log/secure"
+      syslog:
+        - "/var/log/syslog"
+        - "/var/log/messages"
+      kernel:
+        - "/var/log/kern.log"
+      nginx:
+        - "/var/log/nginx/access.log"
+        - "/var/log/nginx/error.log"
+      apache:
+        - "/var/log/apache2/access.log"
+        - "/var/log/apache2/error.log"
+      firewall:
+        - "/var/log/firewalld"
+        - "/var/log/iptables.log"
+      docker:
+        - "/var/log/docker.log"
+      audit:
+        - "/var/log/audit/audit.log"
+
+    # File patterns to exclude from monitoring.
+    # Default: ["*.gz", "*.old", "*.bak"]
+    exclude_patterns:
+      - "*.gz"
+      - "*.old"
+      - "*.bak"
+
+    # Maximum file size (MB) before rotation is assumed.
+    # Default: 100
+    max_file_size_mb: 100
+
+  # Docker events monitoring
+  docker:
+    # Enable Docker daemon event monitoring.
+    # Default: false
+    enabled: false
+
+    # Docker socket path.
+    # Default: /var/run/docker.sock
+    socket_path: "/var/run/docker.sock"
+
+  # auditd monitoring
+  auditd:
+    # Enable auditd log monitoring.
+    # Default: true
+    enabled: true
+
+    # Audit log path.
+    # Default: /var/log/audit/audit.log
+    log_path: "/var/log/audit/audit.log"
+
+# ---------------------------------------------------------------------------
+# Performance Settings
+# ---------------------------------------------------------------------------
+performance:
+  # Soft memory limit (MB). Agent will log warnings as it approaches this.
+  # Env override: AISEC_MEMORY_LIMIT=200
+  # Range: 50-250
+  # Default: 200
+  memory_limit_mb: 200
+
+  # CPU usage limit (percentage of one core).
+  # Range: 1-100
+  # Default: 50
+  cpu_limit_percent: 50
+
+  # Asyncio queue sizes. Larger queues use more memory but drop fewer events.
+  queue_sizes:
+    # Event Bus queue (max pending events).
+    # Env override: AISEC_QUEUE_SIZE=10000
+    # Range: 100-100000
+    # Default: 10000
+    event_bus: 10000
+
+    # Database writer queue (max pending writes).
+    # Range: 100-50000
+    # Default: 5000
+    db_writer: 5000
+
+    # Alert queue (max pending alerts).
+    # Range: 10-10000
+    # Default: 1000
+    alert_queue: 1000
+
+# ---------------------------------------------------------------------------
+# Developer Settings
+# ---------------------------------------------------------------------------
+developer:
+  # Enable developer mode (extended logging, diagnostics).
+  # Default: false
+  developer_mode: false
+
+  # Enable profiling.
+  # Default: false
+  profiling: false
+
+  # Enable replay mode for testing with historical logs.
+  # Default: false
+  replay_mode: false
+
+  # Path to replay log file or directory.
+  # Default: null
+  replay_path: null
+
+  # Replay rate (events per second). 0 = as fast as possible.
+  # Default: 0
+  replay_rate: 0
+
+# ---------------------------------------------------------------------------
+# Metrics Settings
+# ---------------------------------------------------------------------------
+metrics:
+  # Enable internal metrics collection.
+  # Env override: AISEC_METRICS_ENABLED=true
+  # Default: true
+  enabled: true
+
+  # Metrics collection interval (seconds).
+  # Range: 1-3600
+  # Default: 15
+  collection_interval: 15
+
+# ---------------------------------------------------------------------------
+# Profile Selection
+# ---------------------------------------------------------------------------
+profiles:
+  # Active security profile.
+  # Valid values: default, web_server, reverse_proxy, database,
+  #               docker_host, game_server, mail_server, development, custom
+  # Default: default
+  active: default
+
+# ---------------------------------------------------------------------------
+# Rule Pack Selection
+# ---------------------------------------------------------------------------
+rule_packs:
+  # Active detection rule packs. Only these packs are loaded.
+  # Env override: AISEC_RULE_PACKS=core,ssh,nginx
+  # Available: core, ssh, nginx, apache, caddy, docker, mysql, postgres,
+  #            kernel, malware, ddos, game_server, custom
+  # Default: [core]
+  active:
+    - core

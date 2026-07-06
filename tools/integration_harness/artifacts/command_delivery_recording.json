@@ -1,0 +1,23 @@
+{
+  "scenario": "command_delivery",
+  "duration": 0.00015282630920410156,
+  "events": [
+    {
+      "timestamp": 4.76837158203125e-07,
+      "type": "scenario_start",
+      "source": "harness",
+      "data": {
+        "name": "command_delivery"
+      }
+    },
+    {
+      "timestamp": 0.00014281272888183594,
+      "type": "scenario_end",
+      "source": "harness",
+      "data": {
+        "status": "passed",
+        "duration": 0.00013637542724609375
+      }
+    }
+  ]
+}

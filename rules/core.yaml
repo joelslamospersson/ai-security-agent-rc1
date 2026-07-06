@@ -1,0 +1,137 @@
+# =============================================================================
+# Core Detection Rules
+#
+# These are framework-level rules demonstrating the rule format.
+# They are loaded by the Rule Engine and evaluated against every event.
+#
+# Rules never directly ban users or trigger alerts.
+# They only produce RuleMatch objects for the pipeline.
+# =============================================================================
+
+version: "1.0"
+rules:
+
+  # ---------------------------------------------------------------------------
+  # Generic security event triage
+  # ---------------------------------------------------------------------------
+  - id: "core-001"
+    name: "high_security_event"
+    description: "Events with severity 7+ from security sources"
+    enabled: true
+    category: "triage"
+    severity: 5
+    confidence: 80
+    threat_score: 50
+    conditions:
+      field: "severity"
+      operator: gte
+      value: 7
+    ban_duration: 0
+    alert_channel: "info"
+
+  - id: "core-002"
+    name: "low_priority_event"
+    description: "Events with severity 0-2 for baseline monitoring"
+    enabled: true
+    category: "triage"
+    severity: 1
+    confidence: 90
+    threat_score: 5
+    conditions:
+      field: "severity"
+      operator: lte
+      value: 2
+    ban_duration: 0
+    alert_channel: ""
+
+  - id: "core-003"
+    name: "critical_event"
+    description: "Severity 9-10 events require immediate attention"
+    enabled: true
+    category: "triage"
+    severity: 10
+    confidence: 95
+    threat_score: 90
+    conditions:
+      field: "severity"
+      operator: gte
+      value: 9
+    ban_duration: 0
+    alert_channel: "critical"
+
+  - id: "core-004"
+    name: "known_threat_pattern"
+    description: "Event matches known threat identifier pattern"
+    enabled: true
+    category: "pattern"
+    severity: 7
+    confidence: 75
+    threat_score: 65
+    conditions:
+      logical: "and"
+      conditions:
+        - field: "source"
+          operator: regex
+          value: "(ssh|sshd|sudo|auth)"
+        - field: "severity"
+          operator: gte
+          value: 5
+
+  - id: "core-005"
+    name: "error_condition"
+    description: "Events under error priorities (syslog 0-3)"
+    enabled: true
+    category: "triage"
+    severity: 6
+    confidence: 70
+    threat_score: 40
+    conditions:
+      logical: "or"
+      conditions:
+        - field: "priority"
+          operator: lte
+          value: 1
+        - field: "priority"
+          operator: equals
+          value: 2
+        - field: "priority"
+          operator: equals
+          value: 3
+
+  - id: "core-006"
+    name: "kernel_event"
+    description: "Kernel transport events"
+    enabled: true
+    category: "triage"
+    severity: 4
+    confidence: 60
+    threat_score: 30
+    conditions:
+      field: "transport"
+      operator: equals
+      value: "kernel"
+
+  - id: "core-007"
+    name: "missing_required_field"
+    description: "Event missing required source field"
+    enabled: true
+    category: "integrity"
+    severity: 3
+    confidence: 95
+    threat_score: 25
+    conditions:
+      field: "source"
+      operator: missing
+
+  - id: "core-008"
+    name: "authentication_event"
+    description: "Events from authentication-related sources"
+    enabled: true
+    category: "triage"
+    severity: 5
+    confidence: 70
+    threat_score: 45
+    conditions:
+      field: "identifier"
+      operator: regex
+      value: "(sshd|sudo|login|auth|pam)"

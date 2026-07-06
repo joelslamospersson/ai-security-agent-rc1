@@ -1,0 +1,18 @@
+# High security policy — maximum security controls
+description: "Maximum security configuration for sensitive machines"
+version: "1"
+parent: "production"
+heartbeat_interval_seconds: 10
+notification_retention_days: 365
+log_retention_days: 365
+ip_masking_enabled: true
+maintenance_mode: false
+allowed_protocol_versions:
+  - "1.0"
+feature_flags:
+  discord: false
+  geoip: true
+  docker: false
+  web_dashboard: false
+  remote_commands: false
+  experimental: false

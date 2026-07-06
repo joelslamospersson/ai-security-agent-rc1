@@ -1,0 +1,259 @@
+# =============================================================================
+# SSH Detection Rules
+#
+# These rules are loaded by the Rule Engine and evaluated against
+# normalized SecurityEvent objects from the Journald Monitor.
+# =============================================================================
+
+version: "1.0"
+rules:
+
+  # -------------------------------------------------------------------------
+  # Authentication Triage
+  # -------------------------------------------------------------------------
+  - id: "ssh-001"
+    name: "ssh_failed_password"
+    description: "Failed SSH password attempt detected"
+    enabled: true
+    category: "ssh.auth"
+    severity: 5
+    confidence: 60
+    threat_score: 35
+    conditions:
+      logical: "and"
+      conditions:
+        - field: "source"
+          operator: equals
+          value: "journald"
+        - field: "raw_message"
+          operator: regex
+          value: "(?i)Failed password.*sshd"
+    ban_duration: 0
+    alert_channel: ""
+
+  - id: "ssh-002"
+    name: "ssh_successful_login"
+    description: "Successful SSH login detected"
+    enabled: true
+    category: "ssh.auth"
+    severity: 3
+    confidence: 80
+    threat_score: 20
+    conditions:
+      logical: "and"
+      conditions:
+        - field: "source"
+          operator: equals
+          value: "journald"
+        - field: "raw_message"
+          operator: regex
+          value: "(?i)Accepted.*sshd"
+    ban_duration: 0
+    alert_channel: ""
+
+  - id: "ssh-003"
+    name: "ssh_invalid_user"
+    description: "SSH connection attempted with non-existent user"
+    enabled: true
+    category: "ssh.auth"
+    severity: 6
+    confidence: 75
+    threat_score: 45
+    conditions:
+      logical: "and"
+      conditions:
+        - field: "source"
+          operator: equals
+          value: "journald"
+        - field: "raw_message"
+          operator: regex
+          value: "(?i)Invalid user.*sshd"
+    ban_duration: 3600
+    alert_channel: "warning"
+
+  - id: "ssh-004"
+    name: "ssh_root_login_attempt"
+    description: "Direct root SSH login attempt"
+    enabled: true
+    category: "ssh.auth"
+    severity: 7
+    confidence: 80
+    threat_score: 55
+    conditions:
+      logical: "and"
+      conditions:
+        - field: "source"
+          operator: equals
+          value: "journald"
+        - field: "raw_message"
+          operator: regex
+          value: "(?i)Failed password for root.*sshd"
+    ban_duration: 86400
+    alert_channel: "critical"
+
+  # -------------------------------------------------------------------------
+  # Attack Pattern Indicators
+  # -------------------------------------------------------------------------
+  - id: "ssh-005"
+    name: "ssh_brute_force_indicator"
+    description: "High rate of SSH failures from single IP"
+    enabled: true
+    category: "ssh.attack"
+    severity: 8
+    confidence: 85
+    threat_score: 70
+    conditions:
+      logical: "and"
+      conditions:
+        - field: "source"
+          operator: equals
+          value: "journald"
+        - field: "raw_message"
+          operator: regex
+          value: "(?i)(Failed password|Connection closed).*sshd"
+      threshold:
+        count: 50
+        time_window: 300
+    ban_duration: 86400
+    alert_channel: "critical"
+
+  - id: "ssh-006"
+    name: "ssh_username_enumeration"
+    description: "Multiple invalid usernames from single IP"
+    enabled: true
+    category: "ssh.attack"
+    severity: 7
+    confidence: 80
+    threat_score: 60
+    conditions:
+      logical: "and"
+      conditions:
+        - field: "source"
+          operator: equals
+          value: "journald"
+        - field: "raw_message"
+          operator: regex
+          value: "(?i)Invalid user.*sshd"
+      threshold:
+        count: 10
+        time_window: 300
+    ban_duration: 43200
+    alert_channel: "critical"
+
+  - id: "ssh-007"
+    name: "ssh_password_spray"
+    description: "Few attempts against many usernames from single IP"
+    enabled: true
+    category: "ssh.attack"
+    severity: 8
+    confidence: 70
+    threat_score: 65
+    conditions:
+      logical: "and"
+      conditions:
+        - field: "source"
+          operator: equals
+          value: "journald"
+        - field: "raw_message"
+          operator: regex
+          value: "(?i)Failed password.*sshd"
+      threshold:
+        count: 30
+        time_window: 600
+    ban_duration: 86400
+    alert_channel: "critical"
+
+  # -------------------------------------------------------------------------
+  # Session Abuse Indicators
+  # -------------------------------------------------------------------------
+  - id: "ssh-008"
+    name: "ssh_concurrent_sessions"
+    description: "Multiple simultaneous SSH sessions from same IP"
+    enabled: true
+    category: "ssh.session"
+    severity: 5
+    confidence: 65
+    threat_score: 40
+    conditions:
+      logical: "and"
+      conditions:
+        - field: "source"
+          operator: equals
+          value: "journald"
+        - field: "raw_message"
+          operator: regex
+          value: "(?i)session opened.*sshd"
+      threshold:
+        count: 10
+        time_window: 60
+    ban_duration: 3600
+    alert_channel: "warning"
+
+  - id: "ssh-009"
+    name: "ssh_rapid_reconnect"
+    description: "Rapid SSH reconnection loop detected"
+    enabled: true
+    category: "ssh.session"
+    severity: 5
+    confidence: 60
+    threat_score: 35
+    conditions:
+      logical: "and"
+      conditions:
+        - field: "source"
+          operator: equals
+          value: "journald"
+        - field: "raw_message"
+          operator: regex
+          value: "(?i)Connection closed.*sshd"
+      threshold:
+        count: 20
+        time_window: 60
+    ban_duration: 3600
+    alert_channel: "warning"
+
+  # -------------------------------------------------------------------------
+  # Post-Compromise Indicators
+  # -------------------------------------------------------------------------
+  - id: "ssh-010"
+    name: "ssh_success_after_brute"
+    description: "Successful login after repeated failures — likely compromise"
+    enabled: true
+    category: "ssh.compromise"
+    severity: 10
+    confidence: 90
+    threat_score: 90
+    conditions:
+      logical: "and"
+      conditions:
+        - field: "source"
+          operator: equals
+          value: "journald"
+        - field: "raw_message"
+          operator: regex
+          value: "(?i)Accepted.*sshd"
+      threshold:
+        count: 1
+        time_window: 3600
+    ban_duration: 604800
+    alert_channel: "critical"
+
+  - id: "ssh-011"
+    name: "ssh_root_success"
+    description: "Successful root SSH login — extremely rare, likely malicious"
+    enabled: true
+    category: "ssh.compromise"
+    severity: 10
+    confidence: 95
+    threat_score: 95
+    conditions:
+      logical: "and"
+      conditions:
+        - field: "source"
+          operator: equals
+          value: "journald"
+        - field: "raw_message"
+          operator: regex
+          value: "(?i)Accepted.*for root.*sshd"
+    ban_duration: 604800
+    alert_channel: "critical"

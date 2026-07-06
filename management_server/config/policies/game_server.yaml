@@ -1,0 +1,18 @@
+# Game server policy — optimized for gaming workloads
+description: "Optimized settings for game server machines"
+version: "1"
+parent: "default"
+heartbeat_interval_seconds: 10
+notification_retention_days: 7
+log_retention_days: 14
+ip_masking_enabled: false
+maintenance_mode: false
+allowed_protocol_versions:
+  - "1.0"
+feature_flags:
+  discord: false
+  geoip: false
+  docker: true
+  web_dashboard: false
+  remote_commands: false
+  experimental: false

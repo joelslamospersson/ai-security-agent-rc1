@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  # Management Server
+  management:
+    build:
+      context: ../../
+      dockerfile: deployment/Dockerfile.management
+    ports:
+      - "8000:8000"
+    environment:
+      - MGMT_DB_HOST=postgres
+      - MGMT_DB_USER=ai_security
+      - MGMT_DB_PASSWORD=ai_security
+      - MGMT_DB_DATABASE=ai_security
+      - MGMT_DEBUG=true
+      - MGMT_LOG_LEVEL=DEBUG
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - management_logs:/var/log/ai-security
+
+  # PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=ai_security
+      - POSTGRES_PASSWORD=ai_security
+      - POSTGRES_DB=ai_security
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ai_security"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Integration Test Harness
+  harness:
+    build:
+      context: .
+      dockerfile: Dockerfile.harness
+    command: python run_harness.py --scenario all --benchmark
+    depends_on:
+      management:
+        condition: service_started
+    volumes:
+      - ./artifacts:/app/artifacts
+      - ./reports:/app/reports
+
+volumes:
+  postgres_data:
+  management_logs:

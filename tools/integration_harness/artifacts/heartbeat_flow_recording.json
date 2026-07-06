@@ -1,0 +1,23 @@
+{
+  "scenario": "heartbeat_flow",
+  "duration": 0.00013208389282226562,
+  "events": [
+    {
+      "timestamp": 7.152557373046875e-07,
+      "type": "scenario_start",
+      "source": "harness",
+      "data": {
+        "name": "heartbeat_flow"
+      }
+    },
+    {
+      "timestamp": 0.00011992454528808594,
+      "type": "scenario_end",
+      "source": "harness",
+      "data": {
+        "status": "passed",
+        "duration": 0.00011444091796875
+      }
+    }
+  ]
+}

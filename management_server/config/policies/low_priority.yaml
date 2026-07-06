@@ -1,0 +1,18 @@
+# Low priority policy — reduced resource usage for non-critical machines
+description: "Reduced resource usage for low-priority machines"
+version: "1"
+parent: "default"
+heartbeat_interval_seconds: 120
+notification_retention_days: 7
+log_retention_days: 30
+ip_masking_enabled: true
+maintenance_mode: false
+allowed_protocol_versions:
+  - "1.0"
+feature_flags:
+  discord: false
+  geoip: false
+  docker: false
+  web_dashboard: false
+  remote_commands: false
+  experimental: false

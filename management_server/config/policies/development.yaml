@@ -1,0 +1,18 @@
+# Development policy — relaxed settings for development machines
+description: "Development environment with relaxed security for debugging"
+version: "1"
+parent: "default"
+heartbeat_interval_seconds: 60
+notification_retention_days: 7
+log_retention_days: 30
+ip_masking_enabled: false
+maintenance_mode: false
+allowed_protocol_versions:
+  - "1.0"
+feature_flags:
+  discord: true
+  geoip: true
+  docker: true
+  web_dashboard: true
+  remote_commands: true
+  experimental: true

@@ -1,0 +1,168 @@
+# =============================================================================
+# Attack Chain Definitions
+#
+# Chains correlate multiple RuleMatches into security incidents.
+# Stages are evaluated in order. A chain completes when all required
+# stages are matched within the configured timeouts.
+# =============================================================================
+
+version: "1.0"
+chains:
+
+  # ---------------------------------------------------------------------------
+  # SSH brute force → successful auth → sudo escalation
+  # ---------------------------------------------------------------------------
+  - id: "chain-ssh-compromise"
+    name: "SSH Compromise Chain"
+    description: "SSH brute force followed by successful auth and privilege escalation"
+    enabled: true
+    correlation_key: "source_ip"
+    timeout: 3600           # 1 hour for full chain
+    severity: 9
+    threat_score: 85
+    stages:
+
+      - stage_id: "brute_force"
+        stage_type: "ordered"
+        rule_ids:
+          - "ssh-brute-force"
+          - "ssh-failed-password"
+        timeout: 300
+        confidence_modifier: 10
+
+      - stage_id: "successful_auth"
+        stage_type: "ordered"
+        rule_ids:
+          - "ssh-successful-auth"
+        timeout: 300
+        confidence_modifier: 15
+
+      - stage_id: "sudo_execution"
+        stage_type: "ordered"
+        rule_ids:
+          - "sudo-execution"
+          - "sudo-failure"
+        timeout: 300
+        confidence_modifier: 20
+
+      - stage_id: "persistence"
+        stage_type: "optional"
+        rule_ids:
+          - "cron-install"
+          - "ssh-key-install"
+        timeout: 600
+        confidence_modifier: 25
+
+  # ---------------------------------------------------------------------------
+  # Web application attack chain
+  # ---------------------------------------------------------------------------
+  - id: "chain-web-attack"
+    name: "Web Application Attack"
+    description: "Reconnaissance followed by exploitation attempt"
+    enabled: true
+    correlation_key: "source_ip"
+    timeout: 1800
+    severity: 8
+    threat_score: 75
+    stages:
+
+      - stage_id: "reconnaissance"
+        stage_type: "ordered"
+        rule_ids:
+          - "web-scan"
+          - "directory-enumeration"
+          - "path-traversal-probe"
+        timeout: 300
+        confidence_modifier: 10
+
+      - stage_id: "exploitation"
+        stage_type: "ordered"
+        rule_ids:
+          - "sql-injection"
+          - "xss-attempt"
+          - "rce-attempt"
+        timeout: 300
+        confidence_modifier: 20
+
+      - stage_id: "post_exploit"
+        stage_type: "optional"
+        rule_ids:
+          - "webshell-upload"
+          - "outbound-connection"
+        timeout: 600
+        confidence_modifier: 25
+
+  # ---------------------------------------------------------------------------
+  # Port scan → service detection → exploit
+  # ---------------------------------------------------------------------------
+  - id: "chain-scan-to-exploit"
+    name: "Scan to Exploit"
+    description: "Port scan followed by service detection and exploit attempt"
+    enabled: true
+    correlation_key: "source_ip"
+    timeout: 1800
+    severity: 8
+    threat_score: 70
+    stages:
+
+      - stage_id: "port_scan"
+        stage_type: "ordered"
+        rule_ids:
+          - "port-scan"
+          - "syn-scan"
+        timeout: 300
+        confidence_modifier: 10
+
+      - stage_id: "service_detection"
+        stage_type: "ordered"
+        rule_ids:
+          - "service-probe"
+          - "banner-grab"
+        timeout: 300
+        confidence_modifier: 15
+
+      - stage_id: "exploit_attempt"
+        stage_type: "ordered"
+        rule_ids:
+          - "exploit-attempt"
+          - "rce-attempt"
+        timeout: 300
+        confidence_modifier: 25
+
+  # ---------------------------------------------------------------------------
+  # DDoS detection chain
+  # ---------------------------------------------------------------------------
+  - id: "chain-ddos"
+    name: "DDoS Attack"
+    description: "Multiple DDoS indicators from same source"
+    enabled: true
+    correlation_key: "source_ip"
+    timeout: 600
+    severity: 9
+    threat_score: 80
+    stages:
+
+      - stage_id: "traffic_spike"
+        stage_type: "unordered"
+        rule_ids:
+          - "high-connection-rate"
+          - "bandwidth-spike"
+        timeout: 120
+        confidence_modifier: 10
+
+      - stage_id: "l7_indicators"
+        stage_type: "unordered"
+        rule_ids:
+          - "http-flood"
+          - "slowloris"
+          - "api-abuse"
+        timeout: 120
+        confidence_modifier: 15
+
+      - stage_id: "l4_indicators"
+        stage_type: "unordered"
+        rule_ids:
+          - "syn-flood"
+          - "udp-flood"
+        timeout: 120
+        confidence_modifier: 20

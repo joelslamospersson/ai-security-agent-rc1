@@ -1,0 +1,202 @@
+{
+  "scenario": "mixed_attack",
+  "duration": 0.0005548000335693359,
+  "events": [
+    {
+      "timestamp": 9.5367431640625e-07,
+      "type": "scenario_start",
+      "source": "harness",
+      "data": {
+        "name": "mixed_attack"
+      }
+    },
+    {
+      "timestamp": 0.0004229545593261719,
+      "type": "attack",
+      "source": "attacker",
+      "data": {
+        "count": 4
+      }
+    },
+    {
+      "timestamp": 0.0004494190216064453,
+      "type": "heartbeat",
+      "source": "agent",
+      "data": {
+        "machine_uuid": "00000000-0000-0000-0000-000000000001",
+        "certificate_fingerprint": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6",
+        "protocol_version": "1.0",
+        "agent_version": "2.0.0",
+        "hostname": "test-agent-01",
+        "environment": "production",
+        "timestamp": "2026-07-05T10:35:54.104720+00:00",
+        "sequence_number": 10,
+        "capabilities": {
+          "iptables": true,
+          "sqlite": true,
+          "ssh_detector": true,
+          "geoip": false,
+          "fail2ban": true,
+          "docker": false
+        },
+        "health": {
+          "cpu_percent": 25.0,
+          "ram_percent": 50.0,
+          "disk_percent": 35.0,
+          "load_average": 1.2,
+          "agent_uptime_seconds": 86400,
+          "host_uptime_seconds": 604800
+        },
+        "queues": {
+          "event_queue": 4,
+          "detection_queue": 2,
+          "firewall_queue": 0
+        },
+        "security": {
+          "current_posture": "secured",
+          "trust_indicators": {
+            "binary_integrity": true,
+            "config_integrity": true
+          },
+          "configuration_hash": "abc123",
+          "rule_hash": "def456",
+          "binary_hash": "789abc"
+        }
+      }
+    },
+    {
+      "timestamp": 0.0004622936248779297,
+      "type": "heartbeat",
+      "source": "agent",
+      "data": {
+        "machine_uuid": "00000000-0000-0000-0000-000000000001",
+        "certificate_fingerprint": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6",
+        "protocol_version": "1.0",
+        "agent_version": "2.0.0",
+        "hostname": "test-agent-01",
+        "environment": "production",
+        "timestamp": "2026-07-05T10:35:54.104743+00:00",
+        "sequence_number": 11,
+        "capabilities": {
+          "iptables": true,
+          "sqlite": true,
+          "ssh_detector": true,
+          "geoip": false,
+          "fail2ban": true,
+          "docker": false
+        },
+        "health": {
+          "cpu_percent": 25.0,
+          "ram_percent": 50.0,
+          "disk_percent": 35.0,
+          "load_average": 1.2,
+          "agent_uptime_seconds": 86400,
+          "host_uptime_seconds": 604800
+        },
+        "queues": {
+          "event_queue": 4,
+          "detection_queue": 2,
+          "firewall_queue": 0
+        },
+        "security": {
+          "current_posture": "secured",
+          "trust_indicators": {
+            "binary_integrity": true,
+            "config_integrity": true
+          },
+          "configuration_hash": "abc123",
+          "rule_hash": "def456",
+          "binary_hash": "789abc"
+        }
+      }
+    },
+    {
+      "timestamp": 0.0004734992980957031,
+      "type": "heartbeat",
+      "source": "agent",
+      "data": {
+        "machine_uuid": "00000000-0000-0000-0000-000000000001",
+        "certificate_fingerprint": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6",
+        "protocol_version": "1.0",
+        "agent_version": "2.0.0",
+        "hostname": "test-agent-01",
+        "environment": "production",
+        "timestamp": "2026-07-05T10:35:54.104755+00:00",
+        "sequence_number": 12,
+        "capabilities": {
+          "iptables": true,
+          "sqlite": true,
+          "ssh_detector": true,
+          "geoip": false,
+          "fail2ban": true,
+          "docker": false
+        },
+        "health": {
+          "cpu_percent": 25.0,
+          "ram_percent": 50.0,
+          "disk_percent": 35.0,
+          "load_average": 1.2,
+          "agent_uptime_seconds": 86400,
+          "host_uptime_seconds": 604800
+        },
+        "queues": {
+          "event_queue": 4,
+          "detection_queue": 2,
+          "firewall_queue": 0
+        },
+        "security": {
+          "current_posture": "secured",
+          "trust_indicators": {
+            "binary_integrity": true,
+            "config_integrity": true
+          },
+          "configuration_hash": "abc123",
+          "rule_hash": "def456",
+          "binary_hash": "789abc"
+        }
+      }
+    },
+    {
+      "timestamp": 0.0004887580871582031,
+      "type": "notification",
+      "source": "discord",
+      "data": {
+        "event_type": "attack_detected",
+        "severity": "warning",
+        "machine_id": "00000000-0000-0000-0000-000000000001",
+        "payload": "Detected 4 attack events"
+      }
+    },
+    {
+      "timestamp": 0.0004944801330566406,
+      "type": "notification",
+      "source": "discord",
+      "data": {
+        "event_type": "attack_detected",
+        "severity": "warning",
+        "machine_id": "00000000-0000-0000-0000-000000000001",
+        "payload": "Detected 4 attack events"
+      }
+    },
+    {
+      "timestamp": 0.0004992485046386719,
+      "type": "notification",
+      "source": "discord",
+      "data": {
+        "event_type": "attack_detected",
+        "severity": "warning",
+        "machine_id": "00000000-0000-0000-0000-000000000001",
+        "payload": "Detected 4 attack events"
+      }
+    },
+    {
+      "timestamp": 0.0005435943603515625,
+      "type": "scenario_end",
+      "source": "harness",
+      "data": {
+        "status": "passed",
+        "duration": 0.00052642822265625
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+# Production policy — strict, locked-down configuration
+description: "Production environment with strict security controls"
+version: "1"
+parent: "default"
+heartbeat_interval_seconds: 15
+notification_retention_days: 90
+log_retention_days: 365
+ip_masking_enabled: true
+maintenance_mode: false
+allowed_protocol_versions:
+  - "1.0"
+feature_flags:
+  discord: false
+  geoip: true
+  docker: true
+  web_dashboard: false
+  remote_commands: false
+  experimental: false

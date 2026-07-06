@@ -1,0 +1,49 @@
+[Unit]
+Description=AI Security Management Server
+Documentation=https://github.com/joelslamospersson/ai-security-agent-rc1
+Wants=network-online.target
+After=network-online.target postgresql.service
+
+[Service]
+Type=simple
+User=ai-security
+Group=ai-security
+WorkingDirectory=/opt/ai-security/management-server
+
+# Environment
+EnvironmentFile=/opt/ai-security/management-server/.env
+Environment=PYTHONPATH=/opt/ai-security/management-server/src
+
+# ExecStart — uses gunicorn with uvicorn workers
+# Package is installed via pip install -e . so import resolution works
+ExecStart=/opt/ai-security/management-server/.venv/bin/gunicorn \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --workers 4 \
+    --bind 127.0.0.1:8000 \
+    --timeout 120 \
+    --keep-alive 5 \
+    --max-requests 10000 \
+    --max-requests-jitter 1000 \
+    --graceful-timeout 30 \
+    --access-logfile /var/log/ai-security/management/access.log \
+    --error-logfile /var/log/ai-security/management/error.log \
+    management_server.app:create_app
+
+# Restart
+Restart=always
+RestartSec=5
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/log/ai-security /opt/ai-security/management-server
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ai-security-mgmt
+
+[Install]
+WantedBy=multi-user.target

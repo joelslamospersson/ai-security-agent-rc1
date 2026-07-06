@@ -1,0 +1,17 @@
+# Default policy — base configuration for all machines
+description: "Default base policy for all managed machines"
+version: "1"
+heartbeat_interval_seconds: 30
+notification_retention_days: 30
+log_retention_days: 90
+ip_masking_enabled: true
+maintenance_mode: false
+allowed_protocol_versions:
+  - "1.0"
+feature_flags:
+  discord: false
+  geoip: true
+  docker: false
+  web_dashboard: false
+  remote_commands: false
+  experimental: false

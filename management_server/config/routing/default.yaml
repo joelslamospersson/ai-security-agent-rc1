@@ -1,0 +1,110 @@
+# Default routing rules
+# Each rule matches an event and determines destinations, priority, template.
+
+rules:
+  - name: "critical_alert_all"
+    description: "Critical alerts go everywhere immediately"
+    event_types:
+      - "critical_alert"
+    match_severity: "critical"
+    destinations:
+      - "discord"
+      - "email"
+      - "dashboard"
+    priority: "immediate"
+    template: "detailed"
+    rate_limit_profile: "critical"
+
+  - name: "warning_notify"
+    description: "Warnings go to dashboard and console"
+    event_types:
+      - "warning"
+    match_severity: "warning"
+    destinations:
+      - "dashboard"
+      - "console"
+    priority: "high"
+    template: "detailed"
+
+  - name: "heartbeat_routing"
+    description: "Heartbeat events go to archive"
+    event_types:
+      - "heartbeat"
+    destinations:
+      - "archive"
+    priority: "low"
+    template: "minimal"
+    rate_limit_profile: "bulk"
+
+  - name: "machine_online"
+    description: "Machine online events"
+    event_types:
+      - "machine_online"
+    destinations:
+      - "dashboard"
+      - "console"
+    priority: "normal"
+    template: "minimal"
+
+  - name: "machine_offline"
+    description: "Machine offline events"
+    event_types:
+      - "machine_offline"
+    destinations:
+      - "dashboard"
+      - "console"
+    priority: "high"
+    template: "detailed"
+
+  - name: "registration_events"
+    description: "Registration and pairing events"
+    event_types:
+      - "registration"
+      - "policy_change"
+    destinations:
+      - "dashboard"
+      - "archive"
+    priority: "normal"
+    template: "detailed"
+
+  - name: "certificate_expiring"
+    description: "Certificate expiry warnings"
+    event_types:
+      - "certificate_expiring"
+    destinations:
+      - "dashboard"
+      - "console"
+    priority: "high"
+    template: "detailed"
+
+  - name: "audit_events"
+    description: "Audit events to archive"
+    event_types:
+      - "audit_event"
+    destinations:
+      - "archive"
+    priority: "low"
+    template: "detailed"
+
+  - name: "default_fallback"
+    description: "Catch-all for unmatched events"
+    event_types:
+      - "*"
+    destinations:
+      - "console"
+    priority: "low"
+    template: "minimal"
+
+profiles:
+  - name: "critical"
+    rate_limits:
+      critical: "unlimited"
+      high: "30/min"
+      normal: "10/min"
+      low: "1/min"
+      bulk: "5/min"
+    default_destinations:
+      - "discord"
+      - "email"
+    default_priority: "immediate"
+    default_template: "detailed"
